@@ -32,19 +32,19 @@ file(GLOB_RECURSE PROJECT_SOURCES
         "${PROJECT_SOURCE_DIR}/resource/*.qrc"
 )
 
-qt_add_executable(GithubPage                                            # 构建可执行文件 (Qt6 推荐方式)
+qt_add_executable(Mizuki-Qt                                            # 构建可执行文件 (Qt6 推荐方式)
         MANUAL_FINALIZATION                                             # 手动控制最终化，稍后统一调用
         ${PROJECT_SOURCES}
 )
 
 if(EMSCRIPTEN)
-    set_target_properties(GithubPage PROPERTIES
+    set_target_properties(Mizuki-Qt PROPERTIES
             QT_WASM_INITIAL_MEMORY "80MB"
     )
 endif()
 
 
-target_link_libraries(GithubPage PRIVATE                                # 链接 Qt6 库
+target_link_libraries(Mizuki-Qt PRIVATE                                # 链接 Qt6 库
         Qt6::Core
         Qt6::Gui
         Qt6::Widgets
@@ -61,16 +61,16 @@ include_directories(${PROJECT_SRC_INCLUDE_DIRS})
 
 include(GNUInstallDirs)                                                 # 引入标准安装目录变量
 
-qt_finalize_executable(GithubPage)                                      # Qt6 最终化 (MOC/UIC/RCC)，放在所有链接之后
+qt_finalize_executable(Mizuki-Qt)                                      # Qt6 最终化 (MOC/UIC/RCC)，放在所有链接之后
 
 # 构建后复制产物到 run/server/www（仅 WASM）
 if(EMSCRIPTEN)
-    add_custom_command(TARGET GithubPage POST_BUILD
+    add_custom_command(TARGET Mizuki-Qt POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory
             "${PROJECT_SOURCE_DIR}/run/server/www"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/GithubPage.js"
-            "${CMAKE_BINARY_DIR}/GithubPage.wasm"
+            "${CMAKE_BINARY_DIR}/Mizuki-Qt.js"
+            "${CMAKE_BINARY_DIR}/Mizuki-Qt.wasm"
             "${CMAKE_BINARY_DIR}/qtloader.js"
             "${PROJECT_SOURCE_DIR}/run/server/www/"
             COMMENT "Copying WASM artifacts to server directory"
