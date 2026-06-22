@@ -1,0 +1,111 @@
+# IDE and editor state
+.idea/
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+CMakeLists.txt.user
+CMakeUserPresets.json
+
+# Build outputs
+build/
+cmake-build-*/
+out/
+bin/
+obj/
+Testing/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+install_manifest.txt
+*.ninja
+.ninja_*
+.qt/
+.qtc/
+.qtc_clangd/
+
+# C/C++ and Qt generated binaries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+*_autogen/
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+# Qt WebAssembly generated artifacts
+*.wasm
+*.worker.js
+run/server/www/GithubPage.js
+run/server/www/GithubPage.wasm
+run/server/www/GithubPage.worker.js
+run/server/www/qtloader.js
+run/server/www/qtlogo.svg
+
+# Python runtime, virtual environments and caches
+run/python/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+pip-wheel-metadata/
+
+# Django local state
+run/server/db.sqlite3
+run/server/*.sqlite3
+run/server/media/
+run/server/staticfiles/
+run/server/.idea/
+
+# Large or personal font assets
+run/server/www/font/SimplifiedChinese/
+run/server/www/font/DreamHanSansCN/*.ttf
+!run/server/www/font/DreamHanSansCN/DreamHanSansCN-W9.ttf
+run/server/www/font/loli.ttf
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+local_settings.py
+*.key
+*.pem
+*.crt
+
+# Reference material and scratch files
+reference/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Agent
+.agents
+.workbuddy
+
+opencv.js
