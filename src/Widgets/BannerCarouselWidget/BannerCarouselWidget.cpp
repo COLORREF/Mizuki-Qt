@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QVariantAnimation>
 
+#include "Core/SizeManager/SizeManager.h"
+
 constexpr int aniDuration = 4200;
 constexpr qreal kZoomStart = 1.03;
 constexpr qreal kZoomEnd = 1.13;
@@ -19,10 +21,7 @@ BannerCarouselWidget::BannerCarouselWidget(QWidget *parent) :
     _zoomAni{new QVariantAnimation(this), new QVariantAnimation(this)},
     _opacityAni{new QVariantAnimation(this)}
 {
-    // 防抖定时器 — resize 时仅重置动画，不触发预加载
-    _debounceTimer.setSingleShot(true);
-    _debounceTimer.setInterval(100);
-    connect(&_debounceTimer, &QTimer::timeout, this, &BannerCarouselWidget::restartCurrentAnimation);
+    connect(SizeManager::manager(), &SizeManager::sizeAdjustmentCompleted, this, &BannerCarouselWidget::restartCurrentAnimation);
 
     // 两张图各自的放大动画
     for (const auto i: _zoomAni)
@@ -56,18 +55,6 @@ void BannerCarouselWidget::setPixmap(const QPixmap &pixmap)
     // 首张图到达且动画尚未启动 → 正式开播
     if (slot == static_cast<int>(_current) && _zoomAni[_current]->state() != QAbstractAnimation::Running)
         startZoomAnimation();
-}
-
-void BannerCarouselWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-
-    _fadeInOutTimer.stop();
-    _opacityAni->stop();
-    for (const auto i: _zoomAni)
-        i->stop();
-    _fadeOutIdx = -1;
-    _debounceTimer.start();
 }
 
 void BannerCarouselWidget::paintEvent(QPaintEvent *event)
@@ -134,8 +121,32 @@ void BannerCarouselWidget::onOpacityFinished()
     update();
 }
 
-// 仅重置当前图动画 — resize 专用，不触发 nextImageNeeded
 void BannerCarouselWidget::restartCurrentAnimation()
+{
+    _fadeInOutTimer.stop();
+    _opacityAni->stop();
+    for (const auto i: _zoomAni)
+        i->stop();
+    _fadeOutIdx = -1;
+    _opacity = 1.0;
+
+    const int vh = qRound(window()->height() / window()->devicePixelRatio());
+    if (const int bch = qRound(vh * 0.7); bch >= 300)
+        setFixedHeight(bch);
+
+    if (_pixmaps[_current].isNull())
+        return;
+    _scaledMax[_current] = _pixmaps[_current].scaled(
+        size() * kZoomEnd,
+        Qt::AspectRatioMode::KeepAspectRatioByExpanding,
+        Qt::TransformationMode::SmoothTransformation
+    );
+    _zoomAni[_current]->start();
+    _fadeInOutTimer.start();
+}
+
+// 图片切换专用：不停旧动画，仅重建当前槽位缓存 + 启动 zoom + emit nextImageNeeded
+void BannerCarouselWidget::restartZoomForCurrent()
 {
     if (_pixmaps[_current].isNull())
         return;
@@ -146,6 +157,7 @@ void BannerCarouselWidget::restartCurrentAnimation()
     );
     _zoomAni[_current]->start();
     _fadeInOutTimer.start();
+    emit nextImageNeeded();
 }
 
 // 完整轮播启动 — 重置动画 + 通知外部预加载下一张
@@ -165,6 +177,6 @@ void BannerCarouselWidget::onFadeOutStart()
     }
     _fadeOutIdx = _current;
     _current = !_current;
-    startZoomAnimation(); // 新图以 opacity=1 显示（内部会 emit nextImageNeeded）
+    restartZoomForCurrent(); // 不停旧图 zoom/opacity，仅构建新图缓存 + 启动新 zoom
     _opacityAni->start(); // 旧图开始 1→0 淡出
 }

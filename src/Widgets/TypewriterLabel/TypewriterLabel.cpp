@@ -4,15 +4,17 @@
 
 #include "TypewriterLabel.h"
 
+#include "Core/SizeManager/SizeManager.h"
+
 TypewriterLabel::TypewriterLabel(QWidget *parent) :
     QLabel(parent)
 {
     setAlignment(Qt::AlignmentFlag::AlignCenter);
     connect(&_timer, &QTimer::timeout, this, &TypewriterLabel::tick);
+    connect(SizeManager::manager(), &SizeManager::sizeAdjustmentCompleted, this, &TypewriterLabel::reSetFontSize);
     setTexts({
             "独行独坐，独唱独酬还独卧——朱淑真·减字木兰花",
             "孤舟蓑笠翁，独钓寒江雪——柳宗元·江雪",
-            "此情可待成追忆，只是当时已惘然——李商隐·锦瑟",
             "十年生死两茫茫，不思量，自难忘——苏轼·江城子",
             "落花人独立，微雨燕双飞——晏几道·临江仙",
             "当时明月在，曾照彩云归——晏几道·临江仙",
@@ -130,4 +132,15 @@ void TypewriterLabel::tick()
             }
             break;
     }
+}
+
+void TypewriterLabel::reSetFontSize()
+{
+    const int vw = qRound(window()->width() / window()->devicePixelRatio());
+    const double s = vw > 1280 ? qBound(0.85, vw / 2000.0, 1.0) : 1.0;
+    const int subPx = vw >= 1280 ? qRound(30.0 * s) : vw >= 768 ? qRound(24.0 * s) : vw >= 480 ? 16 : 14;
+    
+    QFont f1 = font();
+    f1.setPixelSize(subPx);
+    setFont(f1);
 }

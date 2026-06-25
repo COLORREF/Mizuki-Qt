@@ -26,6 +26,7 @@ ResourceManager::ResourceManager(QObject *parent) :
 // 异步加载字体 — 每个 URL 独立发起 HTTP 请求
 void ResourceManager::loadFonts()
 {
+    qDebug() << "开始加载字体...";
     static const QStringList FONT_URLS = {
         // QStringLiteral("font/DreamHanSansCN/DreamHanSansCN-W5.ttf"),
         // QStringLiteral("font/DreamHanSansCN/DreamHanSansCN-W7.ttf"),

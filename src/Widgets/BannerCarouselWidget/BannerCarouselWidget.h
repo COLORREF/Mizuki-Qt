@@ -27,14 +27,11 @@ signals:
 protected:
     void paintEvent(QPaintEvent *event) override;
 
-    void resizeEvent(QResizeEvent *event) override;
-
 private:
     QPixmap _pixmaps[2]; // 两张图的原图（由外部 setPixmap 填入，自动选槽位）
     QPixmap _scaledMax[2]; // 预缩放缓存
     qreal _currentScale[2] = {1.0, 1.0}; // 缩放系数
     qreal _opacity = 1.0; // 透明度
-    QTimer _debounceTimer; // 防抖计时器
     QPainterPath _painterPath;
     QVariantAnimation *_zoomAni[2]; // 放大动画
     QVariantAnimation *_opacityAni; // 透明度动画
@@ -51,9 +48,11 @@ private slots:
 
     void onOpacityFinished();
 
-    void restartCurrentAnimation(); // 仅重置当前图预缩放 + 动画（不触发预加载）
+    void restartCurrentAnimation(); // resize 专用：全停全重建 + setFixedHeight
 
-    void startZoomAnimation(); // 完整轮播启动 = 重置动画 + emit nextImageNeeded
+    void restartZoomForCurrent(); // 图片切换专用：不停旧动画，仅重建当前槽位缓存 + 启动 zoom + emit nextImageNeeded
+
+    void startZoomAnimation(); // 完整轮播启动 = restartCurrentAnimation + emit nextImageNeeded
 
     void onFadeOutStart();
 };

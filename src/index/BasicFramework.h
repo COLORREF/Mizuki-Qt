@@ -6,37 +6,26 @@
 #define GITHUBPAGE_BASICFRAMEWORK_H
 
 #include <QLabel>
-#include <QTimer>
 #include <QVBoxLayout>
 
 #include "Widgets/ScrollArea/ScrollArea.h"
 
+class ContentWidget;
 class TypewriterLabel;
 class WaveWidget;
 class BannerCarouselWidget;
-
-class ContentWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit ContentWidget(QWidget *parent);
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-};
 
 
 class BasicFramework : public ScrollArea
 {
     Q_OBJECT
+    friend class Widget;
 
 public:
     explicit BasicFramework(QWidget *parent);
 
-protected:
-    void resizeEvent(QResizeEvent *event) override;
-
+private:
+    QWidget *_scrollContent;
     QVBoxLayout *_vboxLayout;
     BannerCarouselWidget *_bannerCarousel;
     QVBoxLayout *_bannerVboxLayout;
@@ -45,12 +34,9 @@ protected:
     ContentWidget *_content;
     WaveWidget *_wave;
 
-private:
+private slots:
     void setSize() const;
 
-    QTimer _debounceTimer; // 防抖计时器
-
-private slots:
     void initMainUI();
 };
 

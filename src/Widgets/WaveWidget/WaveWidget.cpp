@@ -5,6 +5,8 @@
 #include "WaveWidget.h"
 #include <QPainter>
 #include <QPainterPath>
+
+#include "Core/SizeManager/SizeManager.h"
 #include "Core/Theme/ThemeModeController.h"
 
 
@@ -29,12 +31,19 @@ constexpr qreal Alpha[] = {0.25, 0.50, 0.75, 1.0}; // 透明度
 WaveWidget::WaveWidget(QWidget *parent) :
     QWidget(parent)
 {
-    _tickTimer.setInterval(28); // ~35fps，平衡流畅度与 WASM 性能
+#ifdef Q_OS_WIN
+    _tickTimer.setInterval(17); // ~58fps
+#endif
+#ifdef __EMSCRIPTEN__
+    _tickTimer.setInterval(30); // ~33fps，平衡流畅度与 WASM 性能
+#endif
+
     connect(&_tickTimer, &QTimer::timeout, this, &WaveWidget::recalcOffsets);
 
-    _debounceTimer.setSingleShot(true);
-    _debounceTimer.setInterval(100); // resize 停止后等 100ms 再重建，避免连续 resize 反复渲
-    connect(&_debounceTimer, &QTimer::timeout, this, &WaveWidget::restartCurrentAnimation);
+    // _debounceTimer.setSingleShot(true);
+    // _debounceTimer.setInterval(100); // resize 停止后等 100ms 再重建，避免连续 resize 反复渲
+    // connect(&_debounceTimer, &QTimer::timeout, this, &WaveWidget::restartCurrentAnimation);
+    connect(SizeManager::manager(), &SizeManager::sizeAdjustmentCompleted, this, &WaveWidget::restartCurrentAnimation);
 
     updateFillColors();
     connect(&ThemeModeController::controller(), &ThemeModeController::appThemeChange, this, &WaveWidget::updateFillColors);
@@ -121,15 +130,14 @@ void WaveWidget::paintEvent(QPaintEvent *event)
         painter.drawPixmap(_offsets[i], 0, _pixmaps[i]);
 }
 
-void WaveWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    _tickTimer.stop(); // 停止动画
-    _debounceTimer.start();
-}
-
 void WaveWidget::restartCurrentAnimation()
 {
+    _tickTimer.stop(); // 停止动画
+    const int vh = qRound(window()->height() / window()->devicePixelRatio());
+    const int vw = qRound(window()->width() / window()->devicePixelRatio());
+    const qreal ratio = vw >= 1280 ? 0.089 : vw >= 768 ? 0.072 : vw >= 480 ? 0.059 : 0.0476; // 第4层波浪占比视口高度百分比
+    const int waveH = qRound(qBound(50.f, vh * ratio, 150.f) / 0.78125); // 第4层占比整个波浪区域高度的0.78125，计算得到整个波浪区域高度
+    setFixedHeight(waveH);
     renderLayer(); // 重新构建 4 层路径 + Pixmap
     _elapsed.start(); // 重置时钟
     recalcOffsets(); // 立即算初始偏移，避免首帧空白

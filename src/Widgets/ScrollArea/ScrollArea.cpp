@@ -15,6 +15,6 @@ ScrollArea::ScrollArea(QWidget *parent) :
     setPalette(p);
     setStyle(new ScrollAreaStyle(this));
 
-    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }

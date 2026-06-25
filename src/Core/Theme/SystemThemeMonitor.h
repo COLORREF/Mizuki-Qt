@@ -2,7 +2,7 @@
 #define SYSTEMTHEMEMONITOR_H
 
 #include <QObject>
-#include "Theme.h"
+#include "Core/Defs.h"
 
 #ifdef Q_OS_WIN
 #include <QColor>
@@ -10,20 +10,8 @@
 #include <QThread>
 #include <Windows.h>
 
-enum class SysAccentPalette
-{
-    // 此处枚举为系统主题色及其衍生色，命名采用与WinRT中的命名方式一致（顺便吐槽一下这个构式命名）
-    // 值从小到大的顺序对应颜色由浅到深
-    AccentLight3,
-    AccentLight2,
-    AccentLight1,
-    Accent,
-    AccentDark1,
-    AccentDark2,
-    AccentDark3,
-};
-
 #endif
+
 
 // ── 系统主题监听器 ──
 //     WASM:  基于 matchMedia('prefers-color-scheme: dark') 事件，无需线程

@@ -37,6 +37,7 @@ public slots:
 
 private slots:
     void tick(); // QTimer 回调，驱动状态机
+    void reSetFontSize();
 
 private:
     enum class State { Type, Pause, Delete };

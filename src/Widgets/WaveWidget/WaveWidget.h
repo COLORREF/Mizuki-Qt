@@ -26,7 +26,6 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override; // 4 次 drawPixmap，无抗锯齿无 fillPath
-    void resizeEvent(QResizeEvent *event) override; // 停止驱动，debounce 后重建
 
 private slots:
     void restartCurrentAnimation(); // 重建路径+Pixmap，重启时钟
@@ -43,7 +42,6 @@ private:
 
     QTimer _tickTimer; // 28ms 定时器驱动动画 (~35fps)
     QElapsedTimer _elapsed; // 单调递增计时器，动画的统一时间源
-    QTimer _debounceTimer; // resize 去抖 (100ms singleShot)
 };
 
 #endif //GITHUBPAGE_WAVEWIDGET_H

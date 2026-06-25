@@ -2,7 +2,7 @@
 #define THEMEMODECONTROLLER_H
 
 #include <QObject>
-#include "Theme.h"
+#include "Core/Defs.h"
 
 class ThemeModeController final : public QObject
 {
