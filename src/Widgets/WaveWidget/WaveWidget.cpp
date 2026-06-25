@@ -6,8 +6,8 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include "Core/Paltette/Palette.h"
 #include "Core/SizeManager/SizeManager.h"
-#include "Core/Theme/ThemeModeController.h"
 
 
 constexpr int SamplingAccuracy = 1; // 采样间隔(px)，1=最精细，值越大越粗糙
@@ -46,22 +46,19 @@ WaveWidget::WaveWidget(QWidget *parent) :
     connect(SizeManager::manager(), &SizeManager::sizeAdjustmentCompleted, this, &WaveWidget::restartCurrentAnimation);
 
     updateFillColors();
-    connect(&ThemeModeController::controller(), &ThemeModeController::appThemeChange, this, &WaveWidget::updateFillColors);
+    connect(&Palette::instance(), &Palette::appColorChange, this, &WaveWidget::updateFillColors);
 }
 
 // =============================================================================
-// 颜色更新 — 主题切换时调用
+// 颜色更新 — 主题 / 色相切换时调用
 // =============================================================================
-// Light: #E9F0F5 Dark: #080E13
+// PageBg + 独立透明度 Alpha[i]
 void WaveWidget::updateFillColors()
 {
-    const bool light = ThemeModeController::controller().isAppLight();
-    const int r = light ? 0xE9 : 0x08;
-    const int g = light ? 0xF0 : 0x0E;
-    const int b = light ? 0xF5 : 0x13;
+    const QColor base = Palette::instance()[ColorRole::PageBg];
 
     for (int i = 0; i < 4; ++i)
-        _colors[i] = QColor(r, g, b, qRound(255 * Alpha[i]));
+        _colors[i] = QColor(base.red(), base.green(), base.blue(), qRound(255 * Alpha[i]));
 
     renderLayer(); // 重渲 Pixmap
     update();

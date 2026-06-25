@@ -17,7 +17,6 @@ class ContentWidget : public QWidget
 
 public:
     explicit ContentWidget(QWidget *parent);
-
     ~ContentWidget() override;
 
 protected:
@@ -32,7 +31,6 @@ private:
     QWidget *_rightBar;
 
     QVBoxLayout *_leftBarLayout;
-
     ProfileCard *_profileCard;
 
 private slots:

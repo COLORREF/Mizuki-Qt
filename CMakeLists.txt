@@ -29,8 +29,10 @@ file(GLOB_RECURSE PROJECT_SOURCES
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.qrc"
         "${PROJECT_SOURCE_DIR}/src/*.ui"
-        "${PROJECT_SOURCE_DIR}/resource/*.qrc"
 )
+
+# ── 资源文件 (qt_add_resources 自动追踪 qrc 内部依赖) ─
+qt_add_resources(PROJECT_SOURCES "${PROJECT_SOURCE_DIR}/resource/rcc.qrc")
 
 qt_add_executable(Mizuki-Qt                                            # 构建可执行文件 (Qt6 推荐方式)
         MANUAL_FINALIZATION                                             # 手动控制最终化，稍后统一调用

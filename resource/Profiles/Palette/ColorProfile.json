@@ -1,0 +1,29 @@
+{
+  "Default": {
+    "oklchParams": {
+      "Primary":           { "light": { "l": 0.70, "c": 0.140 }, "dark": { "l": 0.75, "c": 0.140 } },
+      "PageBg":            { "light": { "l": 0.95, "c": 0.010 }, "dark": { "l": 0.16, "c": 0.014 } },
+      "CardBg":            { "light": { "l": 1.00, "c": 0.000 }, "dark": { "l": 0.23, "c": 0.015 } },
+      "FloatPanelBg":      { "light": { "l": 1.00, "c": 0.000 }, "dark": { "l": 0.19, "c": 0.015 } },
+      "DeepText":          { "light": { "l": 0.25, "c": 0.020 } },
+      "TitleActive":       { "light": { "l": 0.60, "c": 0.100 } },
+      "BtnContent":        { "light": { "l": 0.55, "c": 0.120 }, "dark": { "l": 0.75, "c": 0.100 } },
+      "BtnRegularBg":      { "light": { "l": 0.95, "c": 0.025 }, "dark": { "l": 0.33, "c": 0.035 } },
+      "BtnRegularBgHover": { "light": { "l": 0.90, "c": 0.050 }, "dark": { "l": 0.38, "c": 0.040 } },
+      "BtnRegularBgActive":{ "light": { "l": 0.85, "c": 0.080 }, "dark": { "l": 0.43, "c": 0.045 } },
+      "BtnPlainBgHover":   { "light": { "l": 0.95, "c": 0.025 }, "dark": { "l": 0.30, "c": 0.035 } },
+      "BtnPlainBgActive":  { "light": { "l": 0.98, "c": 0.010 }, "dark": { "l": 0.27, "c": 0.025 } },
+      "BtnCardBgHover":    { "light": { "l": 0.98, "c": 0.005 }, "dark": { "l": 0.30, "c": 0.030 } },
+      "BtnCardBgActive":   { "light": { "l": 0.90, "c": 0.030 }, "dark": { "l": 0.35, "c": 0.035 } },
+      "SelectionBg":       { "light": { "l": 0.90, "c": 0.050 }, "dark": { "l": 0.40, "c": 0.080 } },
+      "LinkUnderline":     { "light": { "l": 0.93, "c": 0.040 }, "dark": { "l": 0.40, "c": 0.080 } }
+    },
+    "fixedColors": {
+      "CardBgTransparent": { "light": "#FFFFFFCC", "dark": "#171717CC" },
+      "LineDivider":       { "light": "#00000014", "dark": "#FFFFFF14" },
+      "LineColor":         { "light": "#0000001A", "dark": "#FFFFFF1A" },
+      "ContentMeta":       { "light": "#000000B3", "dark": "#FFFFFF99" },
+      "ScrollbarBg":       { "light": "#00000066", "dark": "#FFFFFF66" }
+    }
+  }
+}

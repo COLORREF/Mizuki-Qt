@@ -5,6 +5,7 @@
 #include "ScrollArea.h"
 
 #include "ScrollAreaStyle.h"
+#include "Widgets//ScrollBar/ScrollBar.h"
 
 ScrollArea::ScrollArea(QWidget *parent) :
     QScrollArea(parent)
@@ -15,6 +16,7 @@ ScrollArea::ScrollArea(QWidget *parent) :
     setPalette(p);
     setStyle(new ScrollAreaStyle(this));
 
-    // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // 替换默认滚动条为自定义圆角滚动条
+    setVerticalScrollBar(new ScrollBar(Qt::Vertical, this));
+    setHorizontalScrollBar(new ScrollBar(Qt::Horizontal, this));
 }

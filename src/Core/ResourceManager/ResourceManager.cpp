@@ -5,19 +5,13 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#include "Core/ResourcePath.h"
+
 ResourceManager &ResourceManager::manager()
 {
     static auto inst = new ResourceManager(qApp);
     return *inst;
 }
-
-#ifdef Q_OS_WIN
-// Windows 桌面：需要绝对 URL 指向本地 Django 服务
-static const auto SERVER_BASE = QStringLiteral("http://localhost:8000/");
-#else
-// WASM：浏览器自动以当前页面 origin 解析相对 URL
-static const QString SERVER_BASE = QString();
-#endif
 
 ResourceManager::ResourceManager(QObject *parent) :
     QObject(parent),
@@ -27,20 +21,13 @@ ResourceManager::ResourceManager(QObject *parent) :
 void ResourceManager::loadFonts()
 {
     qDebug() << "开始加载字体...";
-    static const QStringList FONT_URLS = {
-        // QStringLiteral("font/DreamHanSansCN/DreamHanSansCN-W5.ttf"),
-        // QStringLiteral("font/DreamHanSansCN/DreamHanSansCN-W7.ttf"),
-        QStringLiteral("font/DreamHanSansCN/DreamHanSansCN-W9.ttf"),
-        // QStringLiteral("font/loli.ttf"),
-        QStringLiteral("font/ZenMaruGothic-Medium.ttf"),
-    };
-
-    const int total = static_cast<int>(FONT_URLS.size());
+    const auto &fontUrls = ResourcePath::Server::Fonts;
+    const int total = static_cast<int>(fontUrls.size());
     auto completed = std::make_shared<int>(0);
 
-    for (const QString &url: FONT_URLS)
+    for (const QString &url: fontUrls)
     {
-        QNetworkReply *reply = m_networkManager->get(QNetworkRequest(QUrl(SERVER_BASE + url)));
+        QNetworkReply *reply = m_networkManager->get(QNetworkRequest(QUrl(ResourcePath::serverBase() + url)));
         connect(reply,
                 &QNetworkReply::finished,
                 this,
@@ -71,7 +58,8 @@ void ResourceManager::loadHomeImage()
         return;
     m_maxIdRequestInFlight = true;
 
-    const auto *reply = m_networkManager->get(QNetworkRequest(QUrl(SERVER_BASE + QStringLiteral("api/images/max_id/Homepage/"))));
+    const auto url = ResourcePath::serverBase() + ResourcePath::Server::apiMaxImageId(ResourcePath::Server::CategoryHomepage);
+    const auto *reply = m_networkManager->get(QNetworkRequest(QUrl(url)));
     connect(reply, &QNetworkReply::finished, this, &ResourceManager::onMaxIdReplyFinished);
 }
 
@@ -84,9 +72,8 @@ void ResourceManager::onMaxIdReplyFinished()
     if (reply->error() != QNetworkReply::NoError)
     {
         qWarning() << "获取 Homepage 最大图片编号失败:" << reply->errorString();
-        // 兜底：本地资源图片交替返回
         m_fallbackIdx = 1 - m_fallbackIdx;
-        emit homeImageReady(QPixmap(QStringLiteral(":/image/%1.webp").arg(m_fallbackIdx + 1)));
+        emit homeImageReady(QPixmap(ResourcePath::Local::fallbackHomeImage(m_fallbackIdx + 1)));
         return;
     }
     const int num = reply->readAll().trimmed().toInt();
@@ -94,7 +81,7 @@ void ResourceManager::onMaxIdReplyFinished()
     {
         qWarning() << "Homepage 最大图片编号无效:" << num;
         m_fallbackIdx = 1 - m_fallbackIdx;
-        emit homeImageReady(QPixmap(QStringLiteral(":/image/%1.webp").arg(m_fallbackIdx + 1)));
+        emit homeImageReady(QPixmap(ResourcePath::Local::fallbackHomeImage(m_fallbackIdx + 1)));
         return;
     }
     m_homepageMaxId = num;
@@ -107,14 +94,14 @@ void ResourceManager::requestNextImageById()
 {
     int chosen;
     if (m_lastHomeImageId <= 0 || m_lastHomeImageId >= m_homepageMaxId)
-        chosen = 1; // 首次请求或已到末尾，从头开始
+        chosen = 1;
     else
         chosen = m_lastHomeImageId + 1;
 
     m_lastHomeImageId = chosen;
 
-    // 请求静态文件路径（图片作为静态文件提供）
-    const QString url = SERVER_BASE + QStringLiteral("Images/Homepage/%1.webp").arg(chosen);
+    const auto url = ResourcePath::serverBase()
+                     + ResourcePath::Server::imageUrl(ResourcePath::Server::CategoryHomepage, chosen);
     const auto *reply = m_networkManager->get(QNetworkRequest(QUrl(url)));
     connect(reply, &QNetworkReply::finished, this, &ResourceManager::onImageReplyFinished);
 }
@@ -131,4 +118,30 @@ void ResourceManager::onImageReplyFinished()
 
     reply->deleteLater();
     emit homeImageReady(pixmap);
+}
+
+// ── 头像加载：从后端请求 → 失败回退本地资源 ──
+void ResourceManager::loadAvatar()
+{
+    const auto url = ResourcePath::serverBase() + ResourcePath::Server::avatarUrl();
+    const auto *reply = m_networkManager->get(QNetworkRequest(QUrl(url)));
+    connect(reply, &QNetworkReply::finished, this, &ResourceManager::onAvatarReplyFinished);
+}
+
+void ResourceManager::onAvatarReplyFinished()
+{
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+
+    QPixmap pixmap;
+    if (reply->error() == QNetworkReply::NoError)
+        pixmap.loadFromData(reply->readAll());
+    else
+        qWarning() << "加载头像失败，使用本地回退:" << reply->errorString();
+
+    reply->deleteLater();
+
+    if (pixmap.isNull())
+        pixmap = QPixmap(ResourcePath::Local::FallbackAvatar);
+
+    emit avatarReady(pixmap);
 }

@@ -72,9 +72,6 @@ void AvatarButton::paintEvent(QPaintEvent *event)
     clipPath.addRoundedRect(rect(), kCornerRadius, kCornerRadius);
     painter.setClipPath(clipPath);
 
-    // 白色背景
-    painter.fillRect(rect(), Qt::GlobalColor::white);
-
     if (_scaledPixmap.isNull())
         return;
 

@@ -8,10 +8,10 @@
 
 #include <algorithm>
 
-#include <QHBoxLayout>
 #include <QPainter>
 #include <QVBoxLayout>
 
+#include "Core/Paltette/Palette.h"
 #include "Core/SizeManager/SizeManager.h"
 #include "Core/Theme/ThemeModeController.h"
 #include "Widgets/ProfileCard/ProfileCard.h"
@@ -60,12 +60,8 @@ ContentWidget::ContentWidget(QWidget *parent) :
     _leftBarLayout->addWidget(_profileCard);
     _leftBarLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding));
 
-
-    _parcel->setStyleSheet(QString::fromUtf8("background-color: rgb(170, 85, 0);"));
-    _leftBar->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 255);"));
-    _middleBar->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 255);"));
-    _rightBar->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 0);"));
-
+    // 色相 / 主题切换 → 重绘背景
+    connect(&Palette::instance(), &Palette::appColorChange, this, QOverload<>::of(&ContentWidget::update));
     connect(&ThemeModeController::controller(), &ThemeModeController::appThemeChange, this, QOverload<>::of(&ContentWidget::update));
     connect(SizeManager::manager(), &SizeManager::sizeAdjustmentCompleted, this, &ContentWidget::setSize);
 }
@@ -77,7 +73,7 @@ void ContentWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     QPainter painter(this);
     painter.setPen(Qt::PenStyle::NoPen);
-    painter.fillRect(rect(), QColor(ThemeModeController::controller().isAppLight() ? 0xE9F0F5 : 0x080E13));
+    painter.fillRect(rect(), Palette::instance()[ColorRole::PageBg]);
 }
 
 void ContentWidget::setSize() const

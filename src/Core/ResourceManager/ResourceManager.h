@@ -31,10 +31,12 @@ public:
 
 public slots:
     void loadHomeImage(); // 异步顺序请求一张主页图片（1 → max → 1 循环）
+    void loadAvatar();    // 异步请求头像图片，失败时自动回退到本地资源
 
 signals:
     void allFontsLoaded(); // 所有字体加载就绪
     void homeImageReady(QPixmap pixmap); // 主页图片加载完成
+    void avatarReady(QPixmap pixmap);    // 头像加载完成（成功或回退都会发射）
 
 private:
     explicit ResourceManager(QObject *parent = nullptr);
@@ -42,6 +44,7 @@ private:
     void requestNextImageById(); // 顺序选号（1→max→1 循环）并发起图片请求
     void onMaxIdReplyFinished(); // max_id 请求回调
     void onImageReplyFinished(); // 图片请求回调
+    void onAvatarReplyFinished(); // 头像请求回调
 
     QNetworkAccessManager *m_networkManager;
     int m_homepageMaxId = 0; // Homepage 最大图片编号（0 = 尚未获取 / 无图片）

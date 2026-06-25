@@ -23,11 +23,10 @@ protected:
 
 private:
     QVBoxLayout *_cardLayout;
-
     AvatarButton *_avatar;
 
 private slots:
-    void reSetLayout() const;
+    void reSetLayout();
 };
 
 
