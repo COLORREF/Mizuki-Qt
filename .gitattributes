@@ -1,0 +1,5 @@
+# 图标 SVG 不计入语言统计
+resource/icons/**/*.svg linguist-vendored
+
+# magic_enum 第三方库不计入语言统计
+src/include/magic_enum/**/* linguist-vendored
